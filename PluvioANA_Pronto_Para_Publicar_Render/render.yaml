@@ -3,6 +3,10 @@ services:
     name: pluvioana-web
     runtime: python
     plan: free
+
+    rootDir: PluvioANA_Pronto_Para_Publicar_Render
+
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 180
+
     healthCheckPath: /api/health

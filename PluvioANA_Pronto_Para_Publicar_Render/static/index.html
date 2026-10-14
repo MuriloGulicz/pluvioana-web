@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f6f8fb" />
+  <meta name="description" content="Consulta de precipitação registrada nas estações da ANA, com exportação CSV." />
+  <title>PluvioANA | Monitoramento de precipitação</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icons/icon-192.png" type="image/png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Navegação principal">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 2C12 9 6 15.8 6 21a10 10 0 0020 0C26 15.8 20 9 16 2Z" fill="currentColor"/><path d="M12 22.5c0 2.4 1.6 4 4 4" stroke="#bfeafb" stroke-width="2.8" stroke-linecap="round"/></svg></div>
+      <div class="brand-text"><strong>PluvioANA</strong><small>Inteligência climática</small></div>
+    </div>
+    <div class="sidebar-label">PLATAFORMA</div>
+    <div class="nav-item active"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span>Visão geral</div>
+    <a class="nav-item" href="#resultados"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h4"/></svg></span>Registros de chuva</a>
+    <a class="nav-item" href="#analise"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5M4 19h16M8 16v-5M13 16V7M18 16v-8"/></svg></span>Análise de período</a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-info"><span class="round-status"></span> Consulta à base ANA <p>Os registros são obtidos por uma integração com o serviço público de dados.</p></div>
+    <div class="sidebar-bottom">Projeto acadêmico <span>v2.0 · Web</span></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="bread">Monitoramento <span>/</span> <strong>Visão geral</strong></div>
+      <div class="top-right"><span class="live-dot"></span> Sistema pronto <button type="button" class="install-btn" id="installBtn" hidden>Instalar aplicativo</button><div class="avatar">PA</div></div>
+    </header>
+    <div class="content">
+      <div class="hero-heading">
+        <div><div class="eyebrow"><span class="eyebrow-mark"></span> CONSULTA HIDROMETEOROLÓGICA</div><h1>Monitoramento de <span>precipitação</span></h1><p>Acesse dados pluviométricos da ANA, analise períodos de chuva e exporte seus relatórios.</p></div>
+        <div class="hero-aside"><div class="calendar-line"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg><time id="dateTodayLabel"></time></div><div class="hero-aside-sub">Dados provenientes de estações oficiais</div></div>
+      </div>
+
+      <section class="panel filter-panel" aria-labelledby="filterTitle">
+        <div class="panel-top"><div class="panel-title"><span class="panel-title-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 12h10M10 17h4"/></svg></span><div><h2 id="filterTitle">Parâmetros da consulta</h2><p>Defina a estação e o intervalo para buscar os registros de chuva.</p></div></div><span class="pill pill-muted">FONTE: ANA</span></div>
+        <form id="consultaForm" novalidate>
+          <div class="filters-grid">
+            <label class="field"><span>Código da estação <b>*</b></span><div class="input-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-7 7-12A7 7 0 105 9c0 5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.2"/></svg><input id="estacao" name="estacao" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Ex.: 60478482" required /></div></label>
+            <label class="field"><span>Data inicial <b>*</b></span><div class="input-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg><input id="inicio" name="inicio" type="date" lang="pt-BR" required /></div></label>
+            <label class="field"><span>Data final <b>*</b></span><div class="input-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg><input id="fim" name="fim" type="date" lang="pt-BR" required /></div></label>
+            <label class="field source-field"><span>Tipo de consulta</span><div class="input-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20V10m7 10V4m7 16v-7"/></svg><select id="modo" name="modo"><option value="historico">Chuvas diárias (histórico)</option><option value="telemetria">Telemetria (se houver chuva)</option></select></div></label>
+            <label class="field" id="consistenciaField"><span>Qualidade dos dados</span><div class="input-icon"><svg viewBox="0 0 24 24" fill="none"><path d="m4 12 5 5L20 6"/></svg><select id="consistencia" name="consistencia"><option value="1">Dados brutos (mais recentes)</option><option value="2">Dados consistidos</option></select></div></label>
+          </div>
+          <div class="filter-bottom"><div class="quick-dates"><span class="quick-label">PERÍODOS RÁPIDOS</span><button type="button" data-period="7" class="quick-btn">7 dias</button><button type="button" data-period="30" class="quick-btn selected">30 dias</button><button type="button" data-period="mes" class="quick-btn">Este mês</button><button type="button" data-period="anterior" class="quick-btn">Mês anterior</button></div>
+            <div class="filter-actions"><button id="clearBtn" type="button" class="btn btn-light"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 101.5-5M3 4v5h5"/></svg> Limpar</button><button id="searchBtn" type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg> <span id="searchText">Consultar dados</span></button></div></div>
+          <div class="notice-small" id="sourceHint"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg> <span>Séries históricas fornecem chuva <b>por dia</b>. O horário será exibido como “—” quando não existir na fonte.</span></div>
+        </form>
+      </section>
+
+      <section class="summary-section" aria-label="Resumo dos resultados">
+        <div class="stat-card stat-primary"><div class="stat-info"><div class="stat-label">PRECIPITAÇÃO TOTAL</div><div class="stat-value"><span id="statTotal">0,00</span><small>mm</small></div><div class="stat-helper">Soma dos registros válidos</div></div><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C9 7 5 11 5 15a7 7 0 0014 0c0-4-4-8-7-13Z"/></svg></div></div>
+        <div class="stat-card"><div class="stat-info"><div class="stat-label">REGISTROS RETORNADOS</div><div class="stat-value"><span id="statRecords">0</span></div><div class="stat-helper">Medições no período</div></div><div class="stat-icon icon-blue"><svg viewBox="0 0 24 24" fill="none"><path d="M8 3H4v18h16V3h-4M8 2h8v4H8zM8 11h9M8 15h9"/></svg></div></div>
+        <div class="stat-card"><div class="stat-info"><div class="stat-label">DIAS COM CHUVA</div><div class="stat-value"><span id="statRainDays">0</span><small>dias</small></div><div class="stat-helper">Precipitação superior a zero</div></div><div class="stat-icon icon-violet"><svg viewBox="0 0 24 24" fill="none"><path d="M7 16H5a4 4 0 01.5-8A7 7 0 0119 9a4 4 0 010 8h-1M9 18v3M14 18v3"/></svg></div></div>
+        <div class="stat-card"><div class="stat-info"><div class="stat-label">SEM LEITURA</div><div class="stat-value"><span id="statMissing">0</span></div><div class="stat-helper">Ausentes ≠ 0 mm</div></div><div class="stat-icon icon-orange"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 4h.01"/></svg></div></div>
+      </section>
+
+      <div id="alertBox" class="alert" role="alert" hidden></div>
+      <div class="status-row"><div class="status-message" id="statusText" role="status"><span class="live-dot"></span> Informe uma estação e selecione um período para iniciar.</div><div id="originTag" class="origin-tag">Aguardando consulta</div></div>
+
+      <section class="panel chart-panel" id="analise" aria-labelledby="chartTitle">
+        <div class="panel-top"><div class="panel-title"><span class="panel-title-icon chart-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5m0 14h17M9 16v-5m5 5V7m5 9v-8"/></svg></span><div><h2 id="chartTitle">Distribuição da chuva</h2><p id="chartSubtitle">Visualize a intensidade da precipitação no período consultado.</p></div></div><span class="chart-legend"><i></i> Precipitação (mm)</span></div>
+        <div id="chart" class="chart-content"><div class="chart-empty"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5m0 14h17M9 16v-5m5 5V7m5 9v-8"/></svg><strong>Seu gráfico aparecerá aqui</strong><span>Consulte uma estação para visualizar a distribuição da chuva.</span></div></div>
+      </section>
+
+      <section class="panel results-panel" id="resultados" aria-labelledby="tableTitle">
+        <div class="panel-top results-top"><div class="panel-title"><span class="panel-title-icon table-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M10 10v10"/></svg></span><div><h2 id="tableTitle">Registros de precipitação <span class="table-count" id="countBadge">0</span></h2><p>Detalhamento por estação, data, horário e volume registrado.</p></div></div><div class="results-actions"><div class="search-table"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="tableSearch" placeholder="Filtrar registros..." aria-label="Filtrar registros" /></div><button type="button" class="btn btn-outline" id="exportBtn" disabled><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></svg> Exportar CSV</button></div></div>
+        <p class="mobile-scroll-hint">↔ Deslize a tabela para visualizar todas as colunas.</p>
+        <div class="table-wrap"><table><thead><tr><th><button type="button" class="sort-btn" data-key="estacao">ESTAÇÃO <span>↕</span></button></th><th><button type="button" class="sort-btn" data-key="data">DATA <span>↕</span></button></th><th><button type="button" class="sort-btn" data-key="hora">HORÁRIO <span>↕</span></button></th><th class="right"><button type="button" class="sort-btn" data-key="chuva_mm">CHUVA (MM) <span>↕</span></button></th><th>CONDIÇÃO</th></tr></thead><tbody id="tableBody"><tr><td colspan="5" class="empty-table"><div class="empty-icon">☔</div><strong>Nenhum registro para exibir</strong><span>Os dados consultados aparecerão nesta tabela.</span></td></tr></tbody></table></div>
+        <div class="table-footer"><div id="tableInfo">Nenhum registro</div><div class="page-controls"><label for="pageSize">Linhas:</label><select id="pageSize"><option value="15">15</option><option value="30" selected>30</option><option value="50">50</option><option value="100">100</option></select><button id="prevPage" type="button" aria-label="Página anterior" disabled>‹</button><span id="pageLabel">1 / 1</span><button id="nextPage" type="button" aria-label="Próxima página" disabled>›</button></div></div>
+      </section>
+      <div class="footer"><span>© PluvioANA — Projeto de desenvolvimento de software</span><span>Fonte: Agência Nacional de Águas e Saneamento Básico (ANA) <span class="sep">·</span> <a href="https://telemetriaws1.ana.gov.br/ServiceANA.asmx" target="_blank" rel="noopener noreferrer">Serviço oficial ↗</a></span></div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/app.js" defer></script>
+</body>
+</html>
